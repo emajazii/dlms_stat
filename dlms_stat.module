@@ -72,7 +72,7 @@ include_once('dlms_stat.inc');
     
     foreach ($stat_type as $k => $v) {
       if (!empty($v)) {
-        $items[] = array(
+        $items[$k] = array(
           'name' => $content_types[$k]->name,
           'count' => (int)dlms_stat_count($v)->expression,
         );
@@ -85,6 +85,8 @@ include_once('dlms_stat.inc');
     $total = dlms_stat_total_count($items);
   
     $block['subject'] = t('Library content statistics');
+    
+    // add header to statistic block
     $block['content']['header'] = array(
       '#markup' => t('There are @total materials in the library', array('@total' => $total)),
       '#prefix' => '<div class="dlms-stat-block-header">',
