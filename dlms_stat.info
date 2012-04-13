@@ -1,0 +1,7 @@
+name = "DLMS Stat"
+description = "A block display of the contents and count of the library"
+core = 7.x
+php = 5.2
+package = DLMS
+files[] = dlms_stat.module
+files[] = dlms_stat.inc

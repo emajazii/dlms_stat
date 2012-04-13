@@ -1,0 +1,89 @@
+<?php
+
+include_once('dlms_stat.inc');
+
+/**
+ * Implement hook_menu().
+ */
+ 
+ function dlms_stat_menu() {
+  $items = array();
+  
+  $items['admin/config/system/dlms_stat'] = array(
+    'title' => 'Library Content Statistics',
+    'description' => 'Configuration for the library content statistics block',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dlms_stat_form'),
+    'access arguments' => array('administer content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  return $items;
+ }
+ 
+ function dlms_stat_form($form, &$form_state) {
+  // build an array of node types for the checkboxes options
+  dpm(field_get_items('node', 'book', 'field_book_quantity'));
+  $node_types = array();
+  foreach (node_type_get_types() AS $key) {
+    $node_types[$key->type] = $key->name;
+  }
+  $form['dlms_stat_content_types'] = array(
+    '#type' => 'checkboxes',
+    '#options' => $node_types,
+    '#default_value' =>  variable_get('dlms_stat_content_types', array('book', 'journal', 'paper', 'manuals', 'newspaper')),
+    '#title' => 'Select items',
+    '#description' => t('Check the items to include in statistics display'),
+  );
+  
+  return system_settings_form($form);
+ }
+ 
+ /**
+  * Implements hook_block_info()
+  */
+ function dlms_stat_block_info() {
+  $block = array();
+  
+  $block['total_stat'] = array(
+    // The name of the block in the block admin page
+    'info' => t('Library content statistics'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+  
+  return $block;
+ }
+ 
+ /**
+  * Implement hook_block_view().
+  */
+ function dlms_stat_block_view($delta = '') {
+  $block = array(
+   'subject' => '',
+   'content' => '',
+  );
+  
+  
+  if ($delta == 'total_stat') {
+    
+    $count = dlms_stat_count('book');
+    dpm($content_types = node_type_get_types());
+    $stat_type = variable_get('dlms_stat_content_types', 'book');
+    $items = array();
+    
+    foreach ($stat_type as $k => $v) {
+      if (!empty($v)) {
+        $items[$k] = (int)dlms_stat_count($v)->expression;
+      }
+      //items[$key] = $value;
+     
+    }
+    dpm($items);
+  
+    $block['subject'] = t('Library content statistics');
+    $block['content'] =  t('Books') . $count->expression;
+  }
+  
+  return $block;
+ }
+ 
