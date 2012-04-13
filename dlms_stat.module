@@ -83,6 +83,9 @@ include_once('dlms_stat.inc');
     dpm($items);
     // get total material in the library
     $total = dlms_stat_total_count($items);
+    
+    // get the data to pass to the items element of item_list array
+    $list = dlms_stat_build_list_itemt($items);
   
     $block['subject'] = t('Library content statistics');
     
@@ -91,6 +94,13 @@ include_once('dlms_stat.inc');
       '#markup' => t('There are @total materials in the library', array('@total' => $total)),
       '#prefix' => '<div class="dlms-stat-block-header">',
       '#suffix' => '</div>',
+    );
+    
+    
+    // add stat to block as a list
+    $block['content']['stat'] = array(
+      '#theme' => 'item_list',
+      '#items' => $list,
     );
   }
   
