@@ -81,9 +81,15 @@ include_once('dlms_stat.inc');
      
     }
     dpm($items);
+    // get total material in the library
+    $total = dlms_stat_total_count($items);
   
     $block['subject'] = t('Library content statistics');
-    $block['content'] =  t('Books') . $count->expression;
+    $block['content']['header'] = array(
+      '#markup' => t('There are @total materials in the library', array('@total' => $total)),
+      '#prefix' => '<div class="dlms-stat-block-header">',
+      '#suffix' => '</div>',
+    );
   }
   
   return $block;
