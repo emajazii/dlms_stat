@@ -69,3 +69,35 @@ function dlms_stat_build_list_itemt($stat) {
   
   return $items;
 }
+
+
+function _dlms_stat_item_quantity_query($bundle) {
+  
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+        ->entityCondition('bundle', $bundle)
+        ->propertyCondition('status', 1)
+        ->fieldCondition('field_book_quantity', 'value', 0, '>');
+        
+  return $query->execute();
+}
+
+function dlms_stat_item_quantity($bundle) {
+  $result = _dlms_stat_item_quantity_query($bundle);
+  
+  // check if result is empty and return false
+  if (empty($result)) {
+    return FALSE;
+  }
+  
+   // initialise a count
+   $total_count = 0;
+   foreach ($result['node'] as $node) {
+    //dpm($node->nid);
+    $value = field_get_items('node', node_load($node->nid), 'field_book_quantity');
+    $total_count += (int)$value[0]['value'];
+    //dpm(field_get_items('node', node_load($node->nid), 'field_book_quantity'));
+   }
+   
+   return $total_count;
+}
